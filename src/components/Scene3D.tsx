@@ -65,7 +65,7 @@ const GLBModel = () => {
       const modelCam = cameras[0];
       camera.position.copy(modelCam.position);
       camera.rotation.copy(modelCam.rotation);
-      camera.fov = modelCam.fov || 45;
+      (camera as THREE.PerspectiveCamera).fov = modelCam.fov || 45;
       (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
     } else {
       // Default front angle
