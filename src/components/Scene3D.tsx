@@ -1,4 +1,4 @@
-import { useRef, useMemo, Suspense, useEffect } from "react";
+import { useRef, useMemo, Suspense, useEffect, useLayoutEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, MeshDistortMaterial, useGLTF, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
@@ -59,25 +59,28 @@ const GLBModel = () => {
     };
   }, [actions]);
 
-  // Ignore model camera — use a consistent front view
-  useEffect(() => {
-    camera.position.set(0, 0.5, 6);
-    camera.lookAt(0, 0, 0);
-    (camera as THREE.PerspectiveCamera).fov = 45;
-    (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
-  }, [camera]);
-
-  // Auto-scale and center properly
-  useMemo(() => {
+  // Fit camera to model's bounding box
+  useLayoutEffect(() => {
     const box = new THREE.Box3().setFromObject(scene);
     const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = 4.5 / maxDim;
-    scene.scale.setScalar(scale);
-
     const center = box.getCenter(new THREE.Vector3());
-    scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
-  }, [scene]);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+
+    scene.position.sub(center);
+    scene.scale.setScalar(2.2 / maxDim);
+
+    const fitBox = new THREE.Box3().setFromObject(scene);
+    const fitSize = fitBox.getSize(new THREE.Vector3());
+    const fitCenter = fitBox.getCenter(new THREE.Vector3());
+    const cam = camera as THREE.PerspectiveCamera;
+    const dist = (Math.max(fitSize.x, fitSize.y, fitSize.z) / 2) / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * 1.4;
+
+    cam.position.set(fitCenter.x, fitCenter.y, fitCenter.z + dist);
+    cam.near = 0.1;
+    cam.far = dist * 10;
+    cam.lookAt(fitCenter);
+    cam.updateProjectionMatrix();
+  }, [scene, camera]);
 
   return (
     <group ref={groupRef}>
