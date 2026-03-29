@@ -25,39 +25,34 @@ const HeroSection = () => {
         className="hero-overlay absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${heroImage})` }}
       />
-      <div className="absolute inset-0 bg-background/80" />
+      <div className="absolute inset-0 bg-background/70" />
 
-      {/* Split layout: text left, 3D right */}
-      <div className="relative z-10 flex flex-col md:flex-row items-center h-full max-w-7xl mx-auto px-6 md:px-12">
-        {/* Left: Text content */}
-        <div className="flex-1 flex flex-col justify-center md:pr-8 text-center md:text-left pt-20 md:pt-0">
-          <p className="text-xs tracking-[0.4em] uppercase text-primary mb-6 animate-fade-up" style={{ animationDelay: "0.3s" }}>
-            Luxury Interior Design Studio
-          </p>
-          <h1
-            className="font-serif text-4xl md:text-6xl lg:text-7xl font-medium leading-[0.95] mb-8 animate-fade-up"
-            style={{ animationDelay: "0.5s" }}
-          >
-            Where Vision
-            <br />
-            <span className="text-gradient-gold italic">Becomes Space</span>
-          </h1>
-          <p
-            className="max-w-md text-sm text-muted-foreground leading-relaxed mb-12 animate-fade-up mx-auto md:mx-0"
-            style={{ animationDelay: "0.7s" }}
-          >
-            Crafting bespoke interiors that transcend the ordinary — where every detail tells your story.
-          </p>
-          <div className="animate-fade-up" style={{ animationDelay: "0.9s" }}>
-            <button className="btn-premium">
-              <span>Explore Our World</span>
-            </button>
-          </div>
-        </div>
+      {/* 3D Scene */}
+      <Scene3D />
 
-        {/* Right: 3D Model */}
-        <div className="flex-1 relative h-[40vh] md:h-full w-full">
-          <Scene3D />
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
+        <p className="text-xs tracking-[0.4em] uppercase text-primary mb-6 animate-fade-up" style={{ animationDelay: "0.3s" }}>
+          Luxury Interior Design Studio
+        </p>
+        <h1
+          className="font-serif text-5xl md:text-7xl lg:text-8xl font-medium leading-[0.95] mb-8 animate-fade-up"
+          style={{ animationDelay: "0.5s" }}
+        >
+          Where Vision
+          <br />
+          <span className="text-gradient-gold italic">Becomes Space</span>
+        </h1>
+        <p
+          className="max-w-md text-sm text-muted-foreground leading-relaxed mb-12 animate-fade-up"
+          style={{ animationDelay: "0.7s" }}
+        >
+          Crafting bespoke interiors that transcend the ordinary — where every detail tells your story.
+        </p>
+        <div className="animate-fade-up" style={{ animationDelay: "0.9s" }}>
+          <button className="btn-premium">
+            <span>Explore Our World</span>
+          </button>
         </div>
       </div>
 
