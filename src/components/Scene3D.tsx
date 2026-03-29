@@ -1,6 +1,6 @@
-import { useRef, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial, MeshTransmissionMaterial } from "@react-three/drei";
+import { useRef, useMemo, Suspense } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Float, MeshDistortMaterial, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
 const Particles = () => {
@@ -39,7 +39,52 @@ const Particles = () => {
   );
 };
 
-const GoldSphere = () => {
+const GLBModel = () => {
+  const { scene } = useGLTF("/models/NEW.glb");
+  const ref = useRef<THREE.Group>(null);
+  const { mouse } = useThree();
+
+  useFrame((state) => {
+    if (ref.current) {
+      // Slow auto-rotation
+      ref.current.rotation.y = state.clock.elapsedTime * 0.1;
+      // Mouse parallax
+      ref.current.rotation.x = THREE.MathUtils.lerp(
+        ref.current.rotation.x,
+        mouse.y * 0.15,
+        0.05
+      );
+      ref.current.position.x = THREE.MathUtils.lerp(
+        ref.current.position.x,
+        mouse.x * 0.3,
+        0.05
+      );
+      // Gentle float
+      ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.15;
+    }
+  });
+
+  // Auto-scale to fit
+  useMemo(() => {
+    const box = new THREE.Box3().setFromObject(scene);
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 3 / maxDim;
+    scene.scale.setScalar(scale);
+
+    // Center the model
+    const center = box.getCenter(new THREE.Vector3());
+    scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+  }, [scene]);
+
+  return (
+    <group ref={ref}>
+      <primitive object={scene} />
+    </group>
+  );
+};
+
+const FallbackSphere = () => {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
@@ -65,32 +110,7 @@ const GoldSphere = () => {
   );
 };
 
-const GlassRing = () => {
-  const ref = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.rotation.x = state.clock.elapsedTime * 0.1;
-      ref.current.rotation.z = state.clock.elapsedTime * 0.08;
-    }
-  });
-
-  return (
-    <mesh ref={ref} scale={3}>
-      <torusGeometry args={[1, 0.05, 16, 100]} />
-      <MeshTransmissionMaterial
-        backside
-        samples={4}
-        thickness={0.2}
-        roughness={0.1}
-        transmission={0.95}
-        ior={1.5}
-        chromaticAberration={0.06}
-        color="#ffffff"
-      />
-    </mesh>
-  );
-};
+useGLTF.preload("/models/NEW.glb");
 
 const Scene3D = () => {
   return (
@@ -100,12 +120,13 @@ const Scene3D = () => {
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
       >
-        <ambientLight intensity={0.3} />
-        <directionalLight position={[5, 5, 5]} intensity={1} color="#c9a84c" />
+        <ambientLight intensity={0.4} />
+        <directionalLight position={[5, 5, 5]} intensity={1.2} color="#c9a84c" />
         <pointLight position={[-5, -5, 5]} intensity={0.5} color="#6b5a2e" />
         <spotLight position={[0, 10, 0]} intensity={0.8} color="#fff8e7" angle={0.3} penumbra={1} />
-        <GoldSphere />
-        <GlassRing />
+        <Suspense fallback={<FallbackSphere />}>
+          <GLBModel />
+        </Suspense>
         <Particles />
         <fog attach="fog" args={["#0d1117", 5, 20]} />
       </Canvas>
