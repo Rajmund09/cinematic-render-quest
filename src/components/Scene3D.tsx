@@ -1,6 +1,6 @@
-import { useRef, useMemo, Suspense } from "react";
+import { useRef, useMemo, Suspense, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Float, MeshDistortMaterial, useGLTF } from "@react-three/drei";
+import { Float, MeshDistortMaterial, useGLTF, useAnimations } from "@react-three/drei";
 import * as THREE from "three";
 
 const Particles = () => {
@@ -20,7 +20,6 @@ const Particles = () => {
   useFrame((state) => {
     if (ref.current) {
       ref.current.rotation.y = state.clock.elapsedTime * 0.02;
-      ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.01) * 0.1;
     }
   });
 
@@ -40,45 +39,55 @@ const Particles = () => {
 };
 
 const GLBModel = () => {
-  const { scene } = useGLTF("/models/NEW.glb");
-  const ref = useRef<THREE.Group>(null);
-  const { mouse } = useThree();
+  const { scene, animations, cameras } = useGLTF("/models/NEW.glb") as any;
+  const groupRef = useRef<THREE.Group>(null);
+  const { actions } = useAnimations(animations, groupRef);
+  const { camera } = useThree();
 
-  useFrame((state) => {
-    if (ref.current) {
-      // Slow auto-rotation
-      ref.current.rotation.y = state.clock.elapsedTime * 0.1;
-      // Mouse parallax
-      ref.current.rotation.x = THREE.MathUtils.lerp(
-        ref.current.rotation.x,
-        mouse.y * 0.15,
-        0.05
-      );
-      ref.current.position.x = THREE.MathUtils.lerp(
-        ref.current.position.x,
-        mouse.x * 0.3,
-        0.05
-      );
-      // Gentle float
-      ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.15;
+  // Play all animations
+  useEffect(() => {
+    if (actions) {
+      Object.values(actions).forEach((action: any) => {
+        if (action) {
+          action.reset().fadeIn(0.5).play();
+          action.setLoop(THREE.LoopRepeat, Infinity);
+        }
+      });
     }
-  });
+    return () => {
+      Object.values(actions).forEach((action: any) => action?.stop());
+    };
+  }, [actions]);
 
-  // Auto-scale to fit
+  // Use the model's camera if available, otherwise set a front view
+  useEffect(() => {
+    if (cameras && cameras.length > 0) {
+      const modelCam = cameras[0];
+      camera.position.copy(modelCam.position);
+      camera.rotation.copy(modelCam.rotation);
+      camera.fov = modelCam.fov || 45;
+      (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
+    } else {
+      // Default front angle
+      camera.position.set(0, 1, 5);
+      camera.lookAt(0, 0, 0);
+    }
+  }, [cameras, camera]);
+
+  // Auto-scale and center
   useMemo(() => {
     const box = new THREE.Box3().setFromObject(scene);
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = 3 / maxDim;
+    const scale = 3.5 / maxDim;
     scene.scale.setScalar(scale);
 
-    // Center the model
     const center = box.getCenter(new THREE.Vector3());
     scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
   }, [scene]);
 
   return (
-    <group ref={ref}>
+    <group ref={groupRef}>
       <primitive object={scene} />
     </group>
   );
@@ -86,25 +95,17 @@ const GLBModel = () => {
 
 const FallbackSphere = () => {
   const ref = useRef<THREE.Mesh>(null);
-
   useFrame((state) => {
     if (ref.current) {
       ref.current.rotation.y = state.clock.elapsedTime * 0.15;
       ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
     }
   });
-
   return (
     <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
       <mesh ref={ref} scale={1.8}>
         <icosahedronGeometry args={[1, 1]} />
-        <MeshDistortMaterial
-          color="#c9a84c"
-          roughness={0.15}
-          metalness={0.95}
-          distort={0.25}
-          speed={1.5}
-        />
+        <MeshDistortMaterial color="#c9a84c" roughness={0.15} metalness={0.95} distort={0.25} speed={1.5} />
       </mesh>
     </Float>
   );
@@ -116,19 +117,20 @@ const Scene3D = () => {
   return (
     <div className="absolute inset-0">
       <Canvas
-        camera={{ position: [0, 0, 6], fov: 45 }}
+        camera={{ position: [0, 1, 5], fov: 45 }}
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
       >
-        <ambientLight intensity={0.4} />
+        <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1.2} color="#c9a84c" />
+        <directionalLight position={[-3, 3, -3]} intensity={0.4} color="#ffffff" />
         <pointLight position={[-5, -5, 5]} intensity={0.5} color="#6b5a2e" />
         <spotLight position={[0, 10, 0]} intensity={0.8} color="#fff8e7" angle={0.3} penumbra={1} />
         <Suspense fallback={<FallbackSphere />}>
           <GLBModel />
         </Suspense>
         <Particles />
-        <fog attach="fog" args={["#0d1117", 5, 20]} />
+        <fog attach="fog" args={["#0d1117", 8, 25]} />
       </Canvas>
     </div>
   );
