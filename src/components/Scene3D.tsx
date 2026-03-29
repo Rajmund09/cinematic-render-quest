@@ -59,27 +59,20 @@ const GLBModel = () => {
     };
   }, [actions]);
 
-  // Use the model's camera if available, otherwise set a front view
+  // Ignore model camera — use a consistent front view
   useEffect(() => {
-    if (cameras && cameras.length > 0) {
-      const modelCam = cameras[0];
-      camera.position.copy(modelCam.position);
-      camera.rotation.copy(modelCam.rotation);
-      (camera as THREE.PerspectiveCamera).fov = modelCam.fov || 45;
-      (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
-    } else {
-      // Default front angle
-      camera.position.set(0, 1, 5);
-      camera.lookAt(0, 0, 0);
-    }
-  }, [cameras, camera]);
+    camera.position.set(0, 0.5, 6);
+    camera.lookAt(0, 0, 0);
+    (camera as THREE.PerspectiveCamera).fov = 45;
+    (camera as THREE.PerspectiveCamera).updateProjectionMatrix();
+  }, [camera]);
 
-  // Auto-scale and center
+  // Auto-scale and center properly
   useMemo(() => {
     const box = new THREE.Box3().setFromObject(scene);
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = 8 / maxDim;
+    const scale = 4.5 / maxDim;
     scene.scale.setScalar(scale);
 
     const center = box.getCenter(new THREE.Vector3());
