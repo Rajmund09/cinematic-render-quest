@@ -103,7 +103,7 @@ const GLBModel = () => {
 
     // Responsive scale: smaller on mobile
     const isMobile = window.innerWidth < 768;
-    const targetSize = isMobile ? 1.2 : 1.6;
+    const targetSize = isMobile ? 0.6 : 0.9;
     const scale = targetSize / maxDim;
 
     scene.scale.setScalar(scale);
