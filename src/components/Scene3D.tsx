@@ -111,7 +111,7 @@ const GLBModel = () => {
 
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
-      const s = (mobile ? 1.2 : 1.6) / maxDim;
+      const s = (mobile ? 0.6 : 0.9) / maxDim;
       scene.scale.setScalar(s);
       scene.position.set(-center.x * s, -center.y * s, -center.z * s);
     };
