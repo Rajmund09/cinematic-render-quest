@@ -1,9 +1,13 @@
 import { useState, useCallback } from "react";
+import { useLenis } from "@/hooks/useLenis";
+import { useGSAPScrollAnimations } from "@/hooks/useGSAPScrollAnimations";
 import PageLoader from "@/components/PageLoader";
 import ScrollProgress from "@/components/ScrollProgress";
 import CustomCursor from "@/components/CustomCursor";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import ImmersiveTransition from "@/components/ImmersiveTransition";
+import ShowcaseSection from "@/components/ShowcaseSection";
 import AboutSection from "@/components/AboutSection";
 import ProcessSection from "@/components/ProcessSection";
 import PortfolioSection from "@/components/PortfolioSection";
@@ -15,6 +19,9 @@ const Index = () => {
   const [loaded, setLoaded] = useState(false);
   const handleLoaded = useCallback(() => setLoaded(true), []);
 
+  useLenis();
+  useGSAPScrollAnimations();
+
   return (
     <>
       <PageLoader onComplete={handleLoaded} />
@@ -25,6 +32,8 @@ const Index = () => {
           <Navbar />
           <main>
             <HeroSection />
+            <ImmersiveTransition />
+            <ShowcaseSection />
             <AboutSection />
             <ProcessSection />
             <PortfolioSection />

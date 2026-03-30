@@ -1,27 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
 const CustomCursor = () => {
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [hovering, setHovering] = useState(false);
+  const outerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const pos = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    const isTouchDevice = "ontouchstart" in window;
+    const isTouchDevice = "ontouchstart" in window || window.innerWidth < 768;
     if (isTouchDevice) return;
 
     const move = (e: MouseEvent) => {
-      setPos({ x: e.clientX, y: e.clientY });
+      pos.current = { x: e.clientX, y: e.clientY };
       setVisible(true);
+
+      // Inner dot follows instantly
+      if (innerRef.current) {
+        gsap.set(innerRef.current, { x: e.clientX - 3, y: e.clientY - 3 });
+      }
+      // Outer ring follows with lag
+      if (outerRef.current) {
+        gsap.to(outerRef.current, {
+          x: e.clientX - 16,
+          y: e.clientY - 16,
+          duration: 0.15,
+          ease: "power2.out",
+        });
+      }
     };
 
     const handleOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.closest("a, button, [role='button'], .cursor-hover")) {
-        setHovering(true);
+      if (target.closest("a, button, [role='button'], .cursor-hover") && outerRef.current) {
+        gsap.to(outerRef.current, { scale: 2, opacity: 0.5, duration: 0.3 });
       }
     };
 
-    const handleOut = () => setHovering(false);
+    const handleOut = () => {
+      if (outerRef.current) {
+        gsap.to(outerRef.current, { scale: 1, opacity: 1, duration: 0.3 });
+      }
+    };
+
     const handleLeave = () => setVisible(false);
 
     window.addEventListener("mousemove", move);
@@ -42,22 +63,22 @@ const CustomCursor = () => {
   return (
     <>
       <div
-        className="fixed pointer-events-none z-[99] rounded-full border border-primary/50 transition-transform duration-200"
+        ref={outerRef}
+        className="fixed pointer-events-none z-[99] rounded-full"
         style={{
-          left: pos.x - (hovering ? 24 : 16),
-          top: pos.y - (hovering ? 24 : 16),
-          width: hovering ? 48 : 32,
-          height: hovering ? 48 : 32,
-          transform: hovering ? "scale(1.2)" : "scale(1)",
+          width: 32,
+          height: 32,
+          border: "1px solid hsl(42, 65%, 55%, 0.5)",
+          mixBlendMode: "difference",
         }}
       />
       <div
-        className="fixed pointer-events-none z-[99] rounded-full bg-primary"
+        ref={innerRef}
+        className="fixed pointer-events-none z-[99] rounded-full"
         style={{
-          left: pos.x - 3,
-          top: pos.y - 3,
           width: 6,
           height: 6,
+          background: "hsl(42, 65%, 55%)",
         }}
       />
     </>

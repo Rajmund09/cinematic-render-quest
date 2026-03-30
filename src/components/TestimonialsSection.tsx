@@ -1,4 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const testimonials = [
   {
@@ -30,29 +34,58 @@ const TestimonialsSection = () => {
   }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("animate-fade-up");
-        });
-      },
-      { threshold: 0.1 }
-    );
-    sectionRef.current?.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const ctx = gsap.context(() => {
+      gsap.utils.toArray<HTMLElement>(".testimonial-reveal").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { y: 50, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              toggleActions: "play none none none",
+            },
+          }
+        );
+      });
+    }, section);
+
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="section-padding cinematic-spacing">
+    <section
+      ref={sectionRef}
+      className="section-padding cinematic-spacing"
+      style={{ background: "hsl(40, 15%, 94%)" }}
+    >
       <div className="max-w-4xl mx-auto text-center">
-        <p className="reveal opacity-0 text-xs tracking-[0.3em] uppercase text-primary mb-4">
+        <p className="testimonial-reveal text-xs tracking-[0.3em] uppercase mb-4" style={{ color: "hsl(42, 65%, 45%)" }}>
           Testimonials
         </p>
-        <h2 className="reveal opacity-0 font-serif text-4xl md:text-5xl mb-20">
-          Words of <span className="text-gradient-gold italic">Praise</span>
+        <h2 className="testimonial-reveal font-serif text-4xl md:text-5xl mb-20" style={{ color: "hsl(220, 15%, 15%)" }}>
+          Words of{" "}
+          <span className="italic" style={{ color: "hsl(42, 65%, 45%)" }}>
+            Praise
+          </span>
         </h2>
 
-        <div className="reveal opacity-0 glass-panel rounded-lg p-10 md:p-16 relative min-h-[280px]">
+        <div
+          className="testimonial-reveal rounded-lg p-10 md:p-16 relative min-h-[280px]"
+          style={{
+            background: "linear-gradient(135deg, hsl(0, 0%, 100%, 0.7), hsl(40, 20%, 98%, 0.4))",
+            backdropFilter: "blur(20px)",
+            border: "1px solid hsl(42, 65%, 55%, 0.15)",
+            boxShadow: "0 20px 60px hsl(220, 15%, 5%, 0.06)",
+          }}
+        >
           {testimonials.map((t, i) => (
             <div
               key={i}
@@ -60,23 +93,24 @@ const TestimonialsSection = () => {
                 i === current ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
               }`}
             >
-              <p className="font-serif text-lg md:text-2xl italic leading-relaxed mb-8 text-foreground/90">
+              <p className="font-serif text-lg md:text-2xl italic leading-relaxed mb-8" style={{ color: "hsl(220, 15%, 20%)" }}>
                 "{t.text}"
               </p>
-              <p className="text-xs tracking-[0.2em] uppercase text-primary">{t.name}</p>
-              <p className="text-xs text-muted-foreground mt-1">{t.role}</p>
+              <p className="text-xs tracking-[0.2em] uppercase" style={{ color: "hsl(42, 65%, 45%)" }}>{t.name}</p>
+              <p className="text-xs mt-1" style={{ color: "hsl(220, 10%, 50%)" }}>{t.role}</p>
             </div>
           ))}
 
-          {/* Dots */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
             {testimonials.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  i === current ? "bg-primary w-6" : "bg-muted-foreground/30"
-                }`}
+                className="w-2 h-2 rounded-full transition-all duration-300"
+                style={{
+                  background: i === current ? "hsl(42, 65%, 55%)" : "hsl(220, 10%, 70%)",
+                  width: i === current ? 24 : 8,
+                }}
               />
             ))}
           </div>
