@@ -59,21 +59,16 @@ const GLBModel = () => {
     };
   }, [actions]);
 
-  // Use the exact camera from the GLB file
+  // Apply the GLB file's camera rotation
   useLayoutEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
-
-    // Exact values from the GLB embedded camera node
-    cam.position.set(-6.290180206298828, 1.6170036792755127, 3.089304208755493);
+    // Apply the exact quaternion rotation from the GLB camera node
     cam.quaternion.set(
       -0.03639477118849754,
       -0.4935424327850342,
       -0.020694753155112267,
       0.8687134385108948
     );
-    cam.fov = THREE.MathUtils.radToDeg(0.5631968779732008); // ~32.3°
-    cam.near = 0.1;
-    cam.far = 100;
     cam.updateProjectionMatrix();
   }, [camera]);
 
@@ -108,7 +103,12 @@ const Scene3D = () => {
   return (
     <div className="absolute inset-0">
       <Canvas
-        camera={{ position: [0, 1, 5], fov: 45 }}
+        camera={{
+          position: [-6.29, 1.617, 3.089],
+          fov: 32.3,
+          near: 0.1,
+          far: 100,
+        }}
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
       >
@@ -121,7 +121,7 @@ const Scene3D = () => {
           <GLBModel />
         </Suspense>
         <Particles />
-        <fog attach="fog" args={["#0d1117", 8, 25]} />
+        <fog attach="fog" args={["#0d1117", 15, 50]} />
       </Canvas>
     </div>
   );
