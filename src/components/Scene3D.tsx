@@ -39,7 +39,7 @@ const Particles = () => {
 };
 
 const GLBModel = () => {
-  const { scene, animations, cameras } = useGLTF("/models/NEW.glb") as any;
+  const { scene, animations } = useGLTF("/models/NEW.glb") as any;
   const groupRef = useRef<THREE.Group>(null);
   const { actions } = useAnimations(animations, groupRef);
   const { camera } = useThree();
@@ -59,66 +59,47 @@ const GLBModel = () => {
     };
   }, [actions]);
 
-  // Use the GLB's own camera if available, otherwise fit to bounding box
+  // Auto-frame: center model and position camera to see it properly
   useLayoutEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
 
-    if (cameras && cameras.length > 0) {
-      // Use the GLB file's camera for proper front view
-      const modelCam = cameras[0];
-      cam.position.copy(modelCam.position);
-      cam.quaternion.copy(modelCam.quaternion);
-      if (modelCam.fov) cam.fov = modelCam.fov;
-      if (modelCam.near) cam.near = modelCam.near;
-      if (modelCam.far) cam.far = modelCam.far;
-    } else {
-      // Fallback: fit camera to model
-      const box = new THREE.Box3().setFromObject(scene);
-      const size = box.getSize(new THREE.Vector3());
-      const center = box.getCenter(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z) || 1;
-
-      scene.position.sub(center);
-
-      const fitBox = new THREE.Box3().setFromObject(scene);
-      const fitCenter = fitBox.getCenter(new THREE.Vector3());
-      const fitSize = fitBox.getSize(new THREE.Vector3());
-      const dist = (Math.max(fitSize.x, fitSize.y, fitSize.z) / 2) / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * 1.6;
-
-      cam.position.set(fitCenter.x, fitCenter.y, fitCenter.z + dist);
-      cam.near = 0.1;
-      cam.far = dist * 10;
-      cam.lookAt(fitCenter);
-    }
-
-    cam.updateProjectionMatrix();
-  }, [scene, camera, cameras]);
-
-  // Center and scale model — smaller, responsive
-  useLayoutEffect(() => {
+    // First center the model at origin
     const box = new THREE.Box3().setFromObject(scene);
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z) || 1;
 
-    // Responsive scale: smaller on mobile
+    // Scale to a reasonable size
     const isMobile = window.innerWidth < 768;
-    const targetSize = isMobile ? 0.6 : 0.9;
+    const targetSize = isMobile ? 1.5 : 2.5;
     const scale = targetSize / maxDim;
 
     scene.scale.setScalar(scale);
     scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
 
+    // Position camera to frame the scaled model
+    const scaledBox = new THREE.Box3().setFromObject(scene);
+    const scaledSize = scaledBox.getSize(new THREE.Vector3());
+    const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+    const dist = (Math.max(scaledSize.x, scaledSize.y, scaledSize.z) / 2) /
+      Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * 1.8;
+
+    cam.position.set(scaledCenter.x, scaledCenter.y + 0.3, dist);
+    cam.near = 0.01;
+    cam.far = dist * 10;
+    cam.lookAt(scaledCenter);
+    cam.updateProjectionMatrix();
+
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
-      const s = (mobile ? 0.6 : 0.9) / maxDim;
+      const s = (mobile ? 1.5 : 2.5) / maxDim;
       scene.scale.setScalar(s);
       scene.position.set(-center.x * s, -center.y * s, -center.z * s);
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [scene]);
+  }, [scene, camera]);
 
   return (
     <group ref={groupRef}>
