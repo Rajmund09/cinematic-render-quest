@@ -59,47 +59,23 @@ const GLBModel = () => {
     };
   }, [actions]);
 
-  // Auto-frame: center model and position camera to see it properly
+  // Use the exact camera from the GLB file
   useLayoutEffect(() => {
     const cam = camera as THREE.PerspectiveCamera;
 
-    // First center the model at origin
-    const box = new THREE.Box3().setFromObject(scene);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z) || 1;
-
-    // Scale to a reasonable size
-    const isMobile = window.innerWidth < 768;
-    const targetSize = isMobile ? 1.5 : 2.5;
-    const scale = targetSize / maxDim;
-
-    scene.scale.setScalar(scale);
-    scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
-
-    // Position camera to frame the scaled model
-    const scaledBox = new THREE.Box3().setFromObject(scene);
-    const scaledSize = scaledBox.getSize(new THREE.Vector3());
-    const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
-    const dist = (Math.max(scaledSize.x, scaledSize.y, scaledSize.z) / 2) /
-      Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * 1.8;
-
-    cam.position.set(scaledCenter.x, scaledCenter.y + 0.3, dist);
-    cam.near = 0.01;
-    cam.far = dist * 10;
-    cam.lookAt(scaledCenter);
+    // Exact values from the GLB embedded camera node
+    cam.position.set(-6.290180206298828, 1.6170036792755127, 3.089304208755493);
+    cam.quaternion.set(
+      -0.03639477118849754,
+      -0.4935424327850342,
+      -0.020694753155112267,
+      0.8687134385108948
+    );
+    cam.fov = THREE.MathUtils.radToDeg(0.5631968779732008); // ~32.3°
+    cam.near = 0.1;
+    cam.far = 100;
     cam.updateProjectionMatrix();
-
-    const handleResize = () => {
-      const mobile = window.innerWidth < 768;
-      const s = (mobile ? 1.5 : 2.5) / maxDim;
-      scene.scale.setScalar(s);
-      scene.position.set(-center.x * s, -center.y * s, -center.z * s);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [scene, camera]);
+  }, [camera]);
 
   return (
     <group ref={groupRef}>
