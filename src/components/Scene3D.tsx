@@ -108,7 +108,12 @@ const Scene3D = () => {
   return (
     <div className="absolute inset-0">
       <Canvas
-        camera={{ position: [0, 1, 5], fov: 45 }}
+        camera={{
+          position: [-6.29, 1.617, 3.089],
+          fov: 32.3,
+          near: 0.1,
+          far: 100,
+        }}
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
       >
@@ -121,7 +126,7 @@ const Scene3D = () => {
           <GLBModel />
         </Suspense>
         <Particles />
-        <fog attach="fog" args={["#0d1117", 8, 25]} />
+        <fog attach="fog" args={["#0d1117", 15, 50]} />
       </Canvas>
     </div>
   );
