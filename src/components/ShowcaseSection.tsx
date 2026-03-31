@@ -93,10 +93,13 @@ const ShowcaseSection = () => {
   const [inView, setInView] = useState(false);
   const [modelExists, setModelExists] = useState(false);
 
-  // Check if the showcase model file exists
+  // Check if the showcase model file actually exists (not an HTML fallback)
   useEffect(() => {
     fetch("/models/SHOWCASE.glb", { method: "HEAD" })
-      .then((res) => setModelExists(res.ok))
+      .then((res) => {
+        const ct = res.headers.get("content-type") || "";
+        setModelExists(res.ok && !ct.includes("text/html"));
+      })
       .catch(() => setModelExists(false));
   }, []);
 
