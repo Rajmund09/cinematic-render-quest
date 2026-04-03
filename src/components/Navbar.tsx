@@ -1,74 +1,81 @@
 import { useEffect, useState } from "react";
-
-const navLinks = [
-  { label: "About", href: "#about" },
-  { label: "Process", href: "#process" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Contact", href: "#contact" },
-];
+import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const scrollTo = (href: string) => {
-    setMenuOpen(false);
-    const el = document.querySelector(href);
-    el?.scrollIntoView({ behavior: "smooth" });
-  };
+  const links = ["Designs", "Features", "Materials", "Testimonials", "Contact"];
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-        scrolled ? "glass-panel py-4" : "py-6 bg-transparent"
-      }`}
+      className={`fixed top-0 w-full z-50 transition-all duration-500 ease-in-out ${scrolled ? "pt-4 sm:pt-6 px-4" : "pt-6 sm:pt-8 px-6 lg:px-8"
+        }`}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-        <a href="#" className="font-serif text-xl tracking-[0.15em] text-gradient-gold">
-          AUREUM
+      <div
+        className={`mx-auto flex items-center justify-between transition-all duration-500 ease-in-out ${scrolled
+            ? "max-w-5xl bg-background/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-foreground/5 rounded-full px-6 lg:px-8 h-16 sm:h-20"
+            : "max-w-7xl bg-transparent border-transparent h-20"
+          }`}
+      >
+        <a
+          href="#"
+          className="text-2xl font-black tracking-tighter text-foreground hover:opacity-80 transition-opacity"
+        >
+          CABINET FACTORY<span className="text-[#8C5A3C]">.</span>
         </a>
 
-        {/* Desktop */}
         <div className="hidden md:flex items-center gap-10">
-          {navLinks.map((link) => (
-            <button
-              key={link.href}
-              onClick={() => scrollTo(link.href)}
-              className="text-xs tracking-[0.2em] uppercase text-muted-foreground hover:text-primary transition-colors duration-300"
+          {links.map((l) => (
+            <a
+              key={l}
+              href={`#${l.toLowerCase()}`}
+              className="relative text-[13px] font-bold tracking-[0.15em] uppercase text-foreground/80 hover:text-[#8C5A3C] transition-all duration-300 hover:-translate-y-0.5 group"
             >
-              {link.label}
-            </button>
+              {l}
+              <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-[#8C5A3C] transition-all duration-300 group-hover:w-full opacity-0 group-hover:opacity-100 rounded-full" />
+            </a>
           ))}
         </div>
 
-        {/* Mobile toggle */}
+        <div className="hidden md:block">
+          <Button className="bg-[#8C5A3C] text-white hover:bg-[#7A4E34] hover:shadow-[0_4px_20px_rgba(140,90,60,0.4)] hover:-translate-y-0.5 rounded-full px-8 py-5 text-sm font-bold tracking-wide transition-all duration-300">
+            GET QUOTE
+          </Button>
+        </div>
+
         <button
-          className="md:hidden flex flex-col gap-1.5"
-          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-foreground hover:text-[#8C5A3C] transition-colors p-2"
+          onClick={() => setMobileOpen(!mobileOpen)}
         >
-          <span className={`block w-6 h-[1px] bg-foreground transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-[3.5px]" : ""}`} />
-          <span className={`block w-6 h-[1px] bg-foreground transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-[3.5px]" : ""}`} />
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="md:hidden glass-panel mt-2 mx-6 rounded-lg p-6 flex flex-col gap-6 animate-fade-up">
-          {navLinks.map((link) => (
-            <button
-              key={link.href}
-              onClick={() => scrollTo(link.href)}
-              className="text-sm tracking-[0.15em] uppercase text-muted-foreground hover:text-primary transition-colors"
-            >
-              {link.label}
-            </button>
-          ))}
+      {mobileOpen && (
+        <div className="md:hidden absolute top-full left-4 right-4 mt-2 bg-background/95 backdrop-blur-2xl border border-foreground/10 rounded-3xl p-6 shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex flex-col gap-2">
+            {links.map((l) => (
+              <a
+                key={l}
+                href={`#${l.toLowerCase()}`}
+                className="block py-4 text-sm font-bold tracking-[0.1em] uppercase text-center text-foreground/80 hover:text-[#8C5A3C] hover:bg-foreground/5 rounded-2xl transition-all"
+                onClick={() => setMobileOpen(false)}
+              >
+                {l}
+              </a>
+            ))}
+            <Button className="w-full mt-4 py-6 bg-[#8C5A3C] text-white hover:bg-[#7A4E34] hover:shadow-[0_4px_20px_rgba(140,90,60,0.4)] rounded-full transition-all duration-300 font-bold tracking-widest uppercase">
+              Get Quote
+            </Button>
+          </div>
         </div>
       )}
     </nav>
