@@ -6,6 +6,7 @@ import ShowcaseSection from "@/components/ShowcaseSection";
 import MaterialsSection from "@/components/MaterialsSection";
 import BeforeAfterSection from "@/components/BeforeAfterSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import InteractiveShowcase from "@/components/InteractiveShowcase";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 
@@ -20,6 +21,7 @@ const Index = () => {
       <MaterialsSection />
       <BeforeAfterSection />
       <TestimonialsSection />
+      <InteractiveShowcase />
       <CTASection />
       <Footer />
     </div>
