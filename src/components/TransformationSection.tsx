@@ -24,12 +24,12 @@ const TransformationSection = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Header animations
+      // Header animations with stagger
       gsap.from(".transform-sub", {
         y: 50,
         opacity: 0,
         duration: 1,
-        ease: "power3.out",
+        ease: "power4.out",
         scrollTrigger: { trigger: sectionRef.current, start: "top 80%" },
       });
       gsap.from(".transform-headline", {
@@ -48,36 +48,40 @@ const TransformationSection = () => {
         scrollTrigger: { trigger: sectionRef.current, start: "top 75%" },
       });
 
-      // Zig-zag rows: alternate slide direction
+      // Zig-zag rows: alternate slide direction with enhanced effects
       document.querySelectorAll(".zigzag-row").forEach((row, i) => {
         const imageEl = row.querySelector(".zigzag-image");
         const textEl = row.querySelector(".zigzag-text");
         const fromLeft = i % 2 === 0;
 
         gsap.from(imageEl, {
-          x: fromLeft ? -120 : 120,
+          x: fromLeft ? -150 : 150,
           opacity: 0,
-          duration: 1.2,
+          scale: 0.9,
+          rotateY: fromLeft ? -8 : 8,
+          duration: 1.4,
           ease: "power3.out",
-          scrollTrigger: { trigger: row, start: "top 80%" },
+          scrollTrigger: { trigger: row, start: "top 82%" },
         });
         gsap.from(textEl, {
-          x: fromLeft ? 120 : -120,
+          x: fromLeft ? 150 : -150,
           opacity: 0,
-          duration: 1.2,
+          duration: 1.4,
           ease: "power3.out",
-          delay: 0.15,
-          scrollTrigger: { trigger: row, start: "top 80%" },
+          delay: 0.2,
+          scrollTrigger: { trigger: row, start: "top 82%" },
         });
       });
 
       // Parallax decorative blobs
       gsap.to(".parallax-blob-1", {
-        y: -80,
+        y: -100,
+        rotation: 20,
         scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 1 },
       });
       gsap.to(".parallax-blob-2", {
-        y: 60,
+        y: 80,
+        rotation: -15,
         scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 1 },
       });
     }, sectionRef);
@@ -88,12 +92,12 @@ const TransformationSection = () => {
     <section ref={sectionRef} id="designs" className="relative py-32 lg:py-48 overflow-hidden bg-background">
       {/* Parallax decorative elements */}
       <div className="parallax-blob-1 absolute top-20 right-10 w-72 h-72 rounded-full bg-accent/5 blur-3xl pointer-events-none" />
-      <div className="parallax-blob-2 absolute bottom-20 left-10 w-96 h-96 rounded-full bg-accent/8 blur-3xl pointer-events-none" />
+      <div className="parallax-blob-2 absolute bottom-20 left-10 w-96 h-96 rounded-full bg-accent/[0.08] blur-3xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-6 lg:px-8 relative z-10">
         {/* Section header */}
         <div className="text-center mb-24">
-          <p className="transform-sub text-sm font-semibold tracking-[0.2em] uppercase text-accent mb-6">
+          <p className="transform-sub text-sm font-semibold tracking-[0.25em] uppercase text-accent mb-6">
             The Concept
           </p>
           <h2 className="transform-headline text-3xl sm:text-4xl lg:text-6xl font-extrabold leading-tight text-foreground">
@@ -109,7 +113,7 @@ const TransformationSection = () => {
         </div>
 
         {/* Criss-cross / zig-zag layout */}
-        <div className="flex flex-col gap-20 lg:gap-28">
+        <div className="flex flex-col gap-24 lg:gap-32">
           {zigzagItems.map((item, i) => {
             const isEven = i % 2 === 0;
             return (
@@ -119,14 +123,17 @@ const TransformationSection = () => {
               >
                 {/* Image card */}
                 <div className={`zigzag-image ${isEven ? "" : "lg:[direction:ltr]"}`}>
-                  <div className="group relative rounded-3xl overflow-hidden shadow-lg border border-foreground/5 bg-white/50 transition-all duration-500 hover:shadow-2xl hover:shadow-accent/10 hover:-translate-y-1">
+                  <div className="group relative rounded-3xl overflow-hidden shadow-xl border border-foreground/5 bg-white/50 transition-all duration-700 hover:shadow-2xl hover:shadow-accent/15 hover:-translate-y-2">
                     <img
                       src={item.image}
                       alt={item.alt}
-                      className="w-full h-[300px] sm:h-[360px] lg:h-[420px] object-cover transform transition-transform duration-700 group-hover:scale-105 mix-blend-multiply"
+                      className="w-full h-[300px] sm:h-[360px] lg:h-[440px] object-cover transform transition-transform duration-700 group-hover:scale-105 mix-blend-multiply"
                     />
                     {/* Hover glow overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                    {/* Corner accent */}
+                    <div className="absolute top-5 left-5 w-8 h-8 border-l-2 border-t-2 border-accent/40 rounded-tl-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute bottom-5 right-5 w-8 h-8 border-r-2 border-b-2 border-accent/40 rounded-br-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   </div>
                 </div>
 

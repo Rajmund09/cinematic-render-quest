@@ -10,89 +10,117 @@ const VideoSection = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Parallax video
-      gsap.to(".video-inner", {
-        yPercent: -15,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1,
-        },
-      });
+      // Video scale-up on scroll
+      gsap.fromTo(
+        ".video-frame",
+        { scale: 0.85, borderRadius: "40px" },
+        {
+          scale: 1,
+          borderRadius: "0px",
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            end: "top 10%",
+            scrub: 1,
+          },
+        }
+      );
 
-      // Text reveal
-      gsap.from(".video-text > *", {
+      // Text content reveal
+      gsap.from(".video-content > *", {
         y: 60,
         opacity: 0,
         duration: 1,
         stagger: 0.15,
-        ease: "power3.out",
-        scrollTrigger: { trigger: sectionRef.current, start: "top 60%" },
+        ease: "power4.out",
+        scrollTrigger: { trigger: ".video-content", start: "top 85%" },
       });
 
-      // Floating decorative elements
-      gsap.to(".video-float-1", {
-        y: -30,
-        rotation: 8,
-        scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 1.5 },
-      });
-      gsap.to(".video-float-2", {
+      // Stats counter animation
+      gsap.from(".video-stat", {
         y: 40,
-        rotation: -5,
-        scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 1.5 },
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power3.out",
+        scrollTrigger: { trigger: ".video-stats", start: "top 90%" },
       });
     }, sectionRef);
     return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative h-[80vh] lg:h-screen overflow-hidden">
-      {/* Video background with camouflage effect */}
-      <div className="absolute inset-0">
-        <div className="video-inner absolute inset-[-15%] w-[130%] h-[130%]">
-          <video
-            ref={videoRef}
-            src="/kitchen.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          />
+    <section ref={sectionRef} className="relative bg-cream">
+      {/* Full-width video with cinematic scaling */}
+      <div className="video-frame relative w-full h-[60vh] lg:h-[85vh] overflow-hidden">
+        <video
+          ref={videoRef}
+          src="/kitchen.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Subtle dark overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+
+        {/* Centered text on video */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center px-6">
+            <p className="text-sm font-semibold tracking-[0.3em] uppercase text-accent mb-5">Immersive Experience</p>
+            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-tight max-w-4xl">
+              Where Design
+              <br />
+              <span className="text-gradient-gold">Meets Craft</span>
+            </h2>
+          </div>
         </div>
-
-        {/* Overlay layers to make it look like a 3D model render */}
-        <div className="absolute inset-0 bg-gradient-to-b from-cream/80 via-transparent to-cream/90" />
-        <div className="absolute inset-0 bg-gradient-to-r from-cream/60 via-transparent to-cream/60" />
-        <div className="absolute inset-0 mix-blend-overlay bg-[radial-gradient(ellipse_at_center,transparent_30%,hsl(var(--cream))_100%)]" />
-        
-        {/* Vignette to mask edges */}
-        <div className="absolute inset-0 shadow-[inset_0_0_120px_60px_hsl(var(--cream))]" />
-
-        {/* Grain/texture overlay for 3D render feel */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }} />
       </div>
 
-      {/* Floating decorative elements */}
-      <div className="video-float-1 absolute top-[15%] right-[10%] w-32 h-32 rounded-full border border-accent/20 pointer-events-none" />
-      <div className="video-float-2 absolute bottom-[20%] left-[8%] w-24 h-24 rounded-full bg-accent/5 blur-xl pointer-events-none" />
+      {/* Content below video */}
+      <div className="video-content max-w-6xl mx-auto px-6 lg:px-8 py-20 lg:py-28">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div>
+            <p className="text-sm font-semibold tracking-[0.2em] uppercase text-accent mb-5">Our Process</p>
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground leading-tight mb-6">
+              Every detail is rendered with <span className="text-gradient-gold">precision</span>
+            </h3>
+            <p className="text-base lg:text-lg text-muted-foreground leading-relaxed mb-6">
+              From material grain to ambient lighting, our team obsesses over every element.
+              We use advanced 3D visualization to perfect designs before a single cut is made,
+              ensuring your vision comes to life exactly as imagined.
+            </p>
+            <p className="text-base text-muted-foreground leading-relaxed">
+              The result? Spaces that don't just look beautiful — they feel inevitable,
+              as if they were always meant to exist.
+            </p>
+          </div>
 
-      {/* Content overlay */}
-      <div className="video-text relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-        <p className="text-sm font-semibold tracking-[0.25em] uppercase text-accent mb-6">Immersive Experience</p>
-        <h2 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-foreground leading-tight max-w-4xl">
-          Where Design
-          <br />
-          <span className="text-gradient-gold">Meets Craft</span>
-        </h2>
-        <p className="mt-8 text-lg text-muted-foreground max-w-lg leading-relaxed">
-          Every detail is rendered with precision — from material grain to ambient lighting.
-        </p>
-        <div className="mt-8 w-20 h-[2px] bg-accent/40 rounded-full" />
+          {/* Stats */}
+          <div className="video-stats grid grid-cols-2 gap-6">
+            {[
+              { value: "500+", label: "Projects Delivered" },
+              { value: "98%", label: "Client Satisfaction" },
+              { value: "15+", label: "Years Experience" },
+              { value: "40+", label: "Material Options" },
+            ].map((stat, i) => (
+              <div
+                key={i}
+                className="video-stat group p-6 rounded-2xl bg-background border border-border/60 hover:border-accent/30 transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5 text-center"
+              >
+                <span className="block text-3xl lg:text-4xl font-black text-foreground group-hover:text-accent transition-colors duration-500">
+                  {stat.value}
+                </span>
+                <span className="text-xs text-muted-foreground tracking-wider uppercase mt-2 block">
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

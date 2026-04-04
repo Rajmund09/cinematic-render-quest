@@ -1,197 +1,109 @@
-import { useRef, useEffect, useState, Suspense, useLayoutEffect } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, useAnimations, Float, MeshDistortMaterial } from "@react-three/drei";
-import * as THREE from "three";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const ShowcaseModel = () => {
-  const { scene, animations, cameras } = useGLTF("/models/SHOWCASE.glb") as any;
-  const groupRef = useRef<THREE.Group>(null);
-  const { actions } = useAnimations(animations, groupRef);
-  const { camera } = useThree();
-
-  useEffect(() => {
-    if (actions) {
-      Object.values(actions).forEach((action: any) => {
-        if (action) {
-          action.reset().fadeIn(0.5).play();
-          action.setLoop(THREE.LoopRepeat, Infinity);
-        }
-      });
-    }
-    return () => {
-      Object.values(actions).forEach((action: any) => action?.stop());
-    };
-  }, [actions]);
-
-  useLayoutEffect(() => {
-    const cam = camera as THREE.PerspectiveCamera;
-    if (cameras && cameras.length > 0) {
-      const modelCam = cameras[0];
-      cam.position.copy(modelCam.position);
-      cam.quaternion.copy(modelCam.quaternion);
-      if (modelCam.fov) cam.fov = modelCam.fov;
-      if (modelCam.near) cam.near = modelCam.near;
-      if (modelCam.far) cam.far = modelCam.far;
-    } else {
-      const box = new THREE.Box3().setFromObject(scene);
-      const size = box.getSize(new THREE.Vector3());
-      const center = box.getCenter(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z) || 1;
-      scene.position.sub(center);
-      const dist = (maxDim / 2) / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * 1.6;
-      cam.position.set(0, 0, dist);
-      cam.near = 0.1;
-      cam.far = dist * 10;
-      cam.lookAt(0, 0, 0);
-    }
-    cam.updateProjectionMatrix();
-  }, [scene, camera, cameras]);
-
-  useLayoutEffect(() => {
-    const box = new THREE.Box3().setFromObject(scene);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    const isMobile = window.innerWidth < 768;
-    const targetSize = isMobile ? 0.5 : 0.8;
-    const scale = targetSize / maxDim;
-    scene.scale.setScalar(scale);
-    scene.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
-  }, [scene]);
-
-  return (
-    <group ref={groupRef}>
-      <primitive object={scene} />
-    </group>
-  );
-};
-
-const ShowcaseFallback = () => {
-  const ref = useRef<THREE.Mesh>(null);
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.rotation.y = state.clock.elapsedTime * 0.15;
-    }
-  });
-  return (
-    <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.5}>
-      <mesh ref={ref} scale={1.5}>
-        <torusKnotGeometry args={[0.8, 0.25, 128, 16]} />
-        <MeshDistortMaterial color="#c9a84c" roughness={0.2} metalness={0.9} distort={0.15} speed={1} />
-      </mesh>
-    </Float>
-  );
-};
+const panels = [
+  {
+    title: "Living Room",
+    desc: "Modular sofas and storage that transform open spaces into organized sanctuaries.",
+    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
+  },
+  {
+    title: "Kitchen",
+    desc: "Precision-engineered cabinetry with hidden compartments and seamless finishes.",
+    image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
+  },
+  {
+    title: "Bedroom",
+    desc: "Wall beds and wardrobe systems that double your usable floor space.",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80",
+  },
+  {
+    title: "Office",
+    desc: "Compact workstations that fold away completely, restoring your living space.",
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+  },
+];
 
 const ShowcaseSection = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  const [modelExists, setModelExists] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
 
-  // Check if the showcase model file actually exists (not an HTML fallback)
   useEffect(() => {
-    fetch("/models/SHOWCASE.glb", { method: "HEAD" })
-      .then((res) => {
-        const ct = res.headers.get("content-type") || "";
-        setModelExists(res.ok && !ct.includes("text/html"));
-      })
-      .catch(() => setModelExists(false));
-  }, []);
+    const ctx = gsap.context(() => {
+      const track = trackRef.current;
+      if (!track) return;
 
-  // Lazy load: only render Canvas when section is in view
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "200px" }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
+      const totalScroll = track.scrollWidth - window.innerWidth;
 
-  // GSAP scroll animation for the section
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    gsap.fromTo(
-      ".showcase-title",
-      { y: 80, opacity: 0, filter: "blur(10px)" },
-      {
-        y: 0,
-        opacity: 1,
-        filter: "blur(0px)",
-        duration: 1.2,
-        ease: "power3.out",
+      // Horizontal scroll pinned section
+      gsap.to(track, {
+        x: -totalScroll,
+        ease: "none",
         scrollTrigger: {
-          trigger: section,
-          start: "top 70%",
-          toggleActions: "play none none none",
+          trigger: containerRef.current,
+          pin: true,
+          scrub: 1,
+          end: () => `+=${totalScroll}`,
         },
-      }
-    );
+      });
 
-    return () => {
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
+      // Individual panel content animations
+      track.querySelectorAll(".hscroll-panel").forEach((panel) => {
+        const content = panel.querySelector(".panel-content");
+        if (content) {
+          gsap.from(content, {
+            x: 80,
+            opacity: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: gsap.getById?.("horizontalScroll") || undefined,
+              start: "left 80%",
+              toggleActions: "play none none none",
+            },
+          });
+        }
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      id="showcase"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: "linear-gradient(180deg, hsl(40, 20%, 96%), hsl(40, 15%, 92%))" }}
-    >
-      {/* Section header */}
-      <div className="relative z-10 text-center px-6 pt-24 pb-8">
-        <p className="showcase-title text-xs tracking-[0.3em] uppercase mb-4 opacity-0" style={{ color: "hsl(42, 65%, 45%)" }}>
-          Interactive Showcase
-        </p>
-        <h2 className="showcase-title font-serif text-4xl md:text-6xl opacity-0" style={{ color: "hsl(220, 15%, 15%)" }}>
-          Experience the{" "}
-          <span className="italic" style={{ color: "hsl(42, 65%, 45%)" }}>
-            Design
-          </span>
-        </h2>
-      </div>
-
-      {/* 3D Canvas */}
-      <div ref={canvasRef} className="relative w-full flex-1 min-h-[50vh] max-h-[70vh]">
-        {inView && (
-          <Canvas
-            camera={{ position: [0, 1, 5], fov: 45 }}
-            dpr={[1, 1.5]}
-            gl={{ antialias: true, alpha: true }}
-            className="!absolute inset-0"
+    <section ref={containerRef} className="overflow-hidden bg-charcoal">
+      <div ref={trackRef} className="flex h-screen w-max">
+        {panels.map((p, i) => (
+          <div
+            key={i}
+            className="hscroll-panel relative flex items-center justify-center w-screen h-screen flex-shrink-0"
           >
-            <ambientLight intensity={0.6} />
-            <directionalLight position={[5, 5, 5]} intensity={1} color="#c9a84c" />
-            <directionalLight position={[-3, 3, -3]} intensity={0.5} color="#ffffff" />
-            <pointLight position={[-5, -5, 5]} intensity={0.4} color="#8b7b4a" />
-            <Suspense fallback={<ShowcaseFallback />}>
-              {modelExists ? <ShowcaseModel /> : <ShowcaseFallback />}
-            </Suspense>
-            <fog attach="fog" args={["#f5f0eb", 8, 25]} />
-          </Canvas>
-        )}
-      </div>
+            {/* Background image */}
+            <img
+              src={p.image}
+              alt={p.title}
+              className="absolute inset-0 w-full h-full object-cover opacity-40"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-charcoal/90 via-charcoal/60 to-charcoal/90" />
 
-      {/* Bottom text */}
-      <div className="relative z-10 text-center px-6 pb-24">
-        <p className="gsap-reveal text-sm max-w-lg mx-auto leading-relaxed" style={{ color: "hsl(220, 10%, 40%)" }}>
-          Interact with our latest design in full 3D. Rotate, zoom, and explore
-          every detail of this meticulously crafted space.
-        </p>
+            {/* Content */}
+            <div className="panel-content relative z-10 text-center px-8 max-w-2xl">
+              <p className="text-sm font-semibold tracking-[0.25em] uppercase text-accent mb-5">
+                {`0${i + 1}`}
+              </p>
+              <h3 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white mb-6">
+                {p.title}
+              </h3>
+              <p className="text-lg text-white/60 leading-relaxed max-w-lg mx-auto">
+                {p.desc}
+              </p>
+              <div className="mt-8 w-16 h-[2px] bg-accent/50 mx-auto rounded-full" />
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
