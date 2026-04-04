@@ -36,11 +36,11 @@ const TestimonialsSection = () => {
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from(".testimonial-reveal", {
-        y: 50,
+        y: 60,
         opacity: 0,
         duration: 1,
         stagger: 0.15,
-        ease: "power3.out",
+        ease: "power4.out",
         scrollTrigger: { trigger: sectionRef.current, start: "top 85%" },
       });
     }, sectionRef);
@@ -48,18 +48,16 @@ const TestimonialsSection = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-32 lg:py-40 bg-secondary">
+    <section ref={sectionRef} id="testimonials" className="py-32 lg:py-44 bg-secondary">
       <div className="max-w-4xl mx-auto text-center px-6">
-        <p className="testimonial-reveal text-sm font-semibold tracking-[0.2em] uppercase text-accent mb-4">
+        <p className="testimonial-reveal text-sm font-semibold tracking-[0.25em] uppercase text-accent mb-5">
           Testimonials
         </p>
         <h2 className="testimonial-reveal text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-20">
           Words of <span className="text-gradient-gold">Praise</span>
         </h2>
 
-        <div
-          className="testimonial-reveal glass-light rounded-2xl p-10 md:p-16 relative min-h-[280px]"
-        >
+        <div className="testimonial-reveal glass-light rounded-3xl p-10 md:p-16 relative min-h-[280px] shadow-xl shadow-accent/5">
           {testimonials.map((t, i) => (
             <div
               key={i}
