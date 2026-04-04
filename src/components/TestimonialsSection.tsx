@@ -6,17 +6,17 @@ gsap.registerPlugin(ScrollTrigger);
 
 const testimonials = [
   {
-    text: "Aureum didn't just design our home — they designed the way we feel in it. Every morning is a revelation.",
+    text: "Cabinet Factory didn't just design our kitchen — they designed the way we feel in it. Every morning is a revelation.",
     name: "Victoria Sterling",
     role: "Private Residence, London",
   },
   {
-    text: "The attention to detail is extraordinary. They understood our brand before we could articulate it ourselves.",
+    text: "The attention to detail is extraordinary. They understood our vision before we could articulate it ourselves.",
     name: "Marcus Chen",
     role: "Boutique Hotel, Tokyo",
   },
   {
-    text: "Working with Aureum felt like collaborating with artists. The result is nothing short of breathtaking.",
+    text: "Working with Cabinet Factory felt like collaborating with artists. The result is nothing short of breathtaking.",
     name: "Isabella Rossi",
     role: "Penthouse, Milan",
   },
@@ -34,57 +34,31 @@ const TestimonialsSection = () => {
   }, []);
 
   useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
     const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>(".testimonial-reveal").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { y: 50, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
+      gsap.from(".testimonial-reveal", {
+        y: 50,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power3.out",
+        scrollTrigger: { trigger: sectionRef.current, start: "top 85%" },
       });
-    }, section);
-
+    }, sectionRef);
     return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="section-padding cinematic-spacing"
-      style={{ background: "hsl(40, 15%, 94%)" }}
-    >
-      <div className="max-w-4xl mx-auto text-center">
-        <p className="testimonial-reveal text-xs tracking-[0.3em] uppercase mb-4" style={{ color: "hsl(42, 65%, 45%)" }}>
+    <section ref={sectionRef} className="py-32 lg:py-40 bg-secondary">
+      <div className="max-w-4xl mx-auto text-center px-6">
+        <p className="testimonial-reveal text-sm font-semibold tracking-[0.2em] uppercase text-accent mb-4">
           Testimonials
         </p>
-        <h2 className="testimonial-reveal font-serif text-4xl md:text-5xl mb-20" style={{ color: "hsl(220, 15%, 15%)" }}>
-          Words of{" "}
-          <span className="italic" style={{ color: "hsl(42, 65%, 45%)" }}>
-            Praise
-          </span>
+        <h2 className="testimonial-reveal text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-20">
+          Words of <span className="text-gradient-gold">Praise</span>
         </h2>
 
         <div
-          className="testimonial-reveal rounded-lg p-10 md:p-16 relative min-h-[280px]"
-          style={{
-            background: "linear-gradient(135deg, hsl(0, 0%, 100%, 0.7), hsl(40, 20%, 98%, 0.4))",
-            backdropFilter: "blur(20px)",
-            border: "1px solid hsl(42, 65%, 55%, 0.15)",
-            boxShadow: "0 20px 60px hsl(220, 15%, 5%, 0.06)",
-          }}
+          className="testimonial-reveal glass-light rounded-2xl p-10 md:p-16 relative min-h-[280px]"
         >
           {testimonials.map((t, i) => (
             <div
@@ -93,11 +67,11 @@ const TestimonialsSection = () => {
                 i === current ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
               }`}
             >
-              <p className="font-serif text-lg md:text-2xl italic leading-relaxed mb-8" style={{ color: "hsl(220, 15%, 20%)" }}>
+              <p className="text-lg md:text-2xl italic leading-relaxed mb-8 text-foreground">
                 "{t.text}"
               </p>
-              <p className="text-xs tracking-[0.2em] uppercase" style={{ color: "hsl(42, 65%, 45%)" }}>{t.name}</p>
-              <p className="text-xs mt-1" style={{ color: "hsl(220, 10%, 50%)" }}>{t.role}</p>
+              <p className="text-xs font-bold tracking-[0.2em] uppercase text-accent">{t.name}</p>
+              <p className="text-xs mt-1 text-muted-foreground">{t.role}</p>
             </div>
           ))}
 
@@ -106,9 +80,9 @@ const TestimonialsSection = () => {
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className="w-2 h-2 rounded-full transition-all duration-300"
+                className="h-2 rounded-full transition-all duration-300"
                 style={{
-                  background: i === current ? "hsl(42, 65%, 55%)" : "hsl(220, 10%, 70%)",
+                  background: i === current ? "hsl(var(--accent))" : "hsl(var(--muted-foreground) / 0.3)",
                   width: i === current ? 24 : 8,
                 }}
               />
