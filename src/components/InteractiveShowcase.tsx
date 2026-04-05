@@ -98,12 +98,11 @@ const InteractiveShowcase = () => {
           </p>
         </div>
 
-        {/* Interactive accordion panels */}
-        <div className="showcase-accordion flex flex-col lg:flex-row gap-3 h-[450px] lg:h-[600px]">
+        <div className="showcase-accordion flex flex-col lg:flex-row gap-3 h-[500px] lg:h-[600px]">
           {showcaseItems.map((item, i) => (
             <div
               key={i}
-              className={`relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              className={`relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-lg ${
                 activeIndex === i ? "lg:flex-[4]" : activeIndex !== null ? "lg:flex-[0.7]" : "lg:flex-1"
               } ${activeIndex === i ? "flex-[3]" : "flex-1"}`}
               onMouseEnter={(e) => handleMouseEnter(i, e)}
@@ -112,18 +111,17 @@ const InteractiveShowcase = () => {
               <img
                 src={item.image}
                 alt={item.title}
+                loading="lazy"
                 className="card-img absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="card-overlay absolute inset-0 bg-charcoal/50 backdrop-blur-[3px] opacity-0" />
 
-              {/* Default label */}
               <div className={`absolute bottom-0 left-0 right-0 p-6 z-10 transition-opacity duration-300 ${activeIndex === i ? "opacity-0" : "opacity-100"}`}>
                 <span className="text-xs font-bold tracking-[0.2em] uppercase text-accent">{item.category}</span>
                 <h3 className="text-xl font-extrabold text-white mt-1">{item.title}</h3>
               </div>
 
-              {/* Hover reveal */}
               <div className="card-content absolute inset-0 flex flex-col items-center justify-center text-center px-8 translate-y-[30px] opacity-0 z-20">
                 <span className="text-xs font-bold tracking-[0.25em] uppercase text-accent mb-3">{item.category}</span>
                 <h3 className="text-2xl lg:text-3xl font-extrabold text-white mb-4">{item.title}</h3>

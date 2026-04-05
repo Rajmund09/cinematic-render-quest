@@ -57,7 +57,7 @@ const TestimonialsSection = () => {
           Words of <span className="text-gradient-gold">Praise</span>
         </h2>
 
-        <div className="testimonial-reveal glass-light rounded-3xl p-10 md:p-16 relative min-h-[280px] shadow-xl shadow-accent/5">
+        <div className="testimonial-reveal relative rounded-3xl p-10 md:p-16 min-h-[280px] bg-white border border-foreground/8 shadow-[0_4px_30px_rgba(0,0,0,0.04)]">
           {testimonials.map((t, i) => (
             <div
               key={i}
