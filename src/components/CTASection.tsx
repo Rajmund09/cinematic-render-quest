@@ -19,7 +19,6 @@ const CTASection = () => {
         scrollTrigger: { trigger: sectionRef.current, start: "top 75%" },
       });
 
-      // Floating glow animation
       gsap.to(".cta-glow-1", {
         y: -30,
         x: 20,
@@ -48,7 +47,7 @@ const CTASection = () => {
         <p className="text-lg text-white/50 mb-12 max-w-xl mx-auto leading-relaxed">
           Book a free consultation with our design team and discover what's possible with Cabinet Factory precision.
         </p>
-        <Button size="lg" className="bg-accent text-white hover:bg-accent/90 rounded-full px-10 text-base font-semibold shadow-lg shadow-accent/20 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-accent/30">
+        <Button size="lg" className="bg-accent text-white hover:bg-accent/90 rounded-full px-10 text-base font-semibold shadow-lg shadow-accent/20 transition-all duration-500 hover:scale-105 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5">
           Book Consultation
         </Button>
       </div>

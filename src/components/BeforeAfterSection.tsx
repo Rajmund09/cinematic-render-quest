@@ -56,7 +56,7 @@ const BeforeAfterSection = () => {
         </div>
         <div
           ref={containerRef}
-          className="ba-slider relative w-full aspect-[16/9] rounded-3xl overflow-hidden cursor-ew-resize select-none shadow-2xl border border-border/30"
+          className="ba-slider relative w-full aspect-[16/9] rounded-3xl overflow-hidden cursor-ew-resize select-none shadow-2xl border border-foreground/8"
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onPointerLeave={onPointerUp}
