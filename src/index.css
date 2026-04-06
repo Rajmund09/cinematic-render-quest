@@ -18,16 +18,16 @@
     --secondary-foreground: 0 0% 10%;
     --muted: 40 4% 95%;
     --muted-foreground: 0 0% 45%;
-    --accent: 38 38% 60%;
-    --accent-foreground: 0 0% 10%;
+    --accent: 22.5 40% 39.2%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 40 6% 90%;
     --input: 40 6% 90%;
-    --ring: 38 38% 60%;
+    --ring: 22.5 40% 39.2%;
     --radius: 0.75rem;
-    --gold: 38 38% 60%;
-    --gold-light: 38 30% 75%;
+    --gold: 22.5 40% 39.2%;
+    --gold-light: 22.5 45% 45%;
     --charcoal: 0 0% 10%;
     --charcoal-light: 0 0% 20%;
     --cream: 40 20% 97%;
@@ -54,13 +54,13 @@
     --secondary-foreground: 0 0% 95%;
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 60%;
-    --accent: 38 38% 60%;
+    --accent: 22.5 40% 39.2%;
     --accent-foreground: 0 0% 95%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 18%;
     --input: 0 0% 18%;
-    --ring: 38 38% 60%;
+    --ring: 22.5 40% 39.2%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,10 +100,11 @@
 
 @layer utilities {
   .text-gradient-gold {
-    background: linear-gradient(135deg, hsl(38 38% 60%), hsl(38 30% 75%));
+    background: linear-gradient(135deg, #8C5A3C, #A67352);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    font-style: italic;
   }
 
   .glass {
@@ -138,11 +139,11 @@
   inset: -16px;
   border-radius: 28px;
   background: conic-gradient(from 0deg,
-      hsla(38, 38%, 60%, 0.25),
-      hsla(38, 30%, 75%, 0.08),
-      hsla(38, 38%, 60%, 0.25),
-      hsla(38, 30%, 75%, 0.08),
-      hsla(38, 38%, 60%, 0.25));
+      rgba(140, 90, 60, 0.25),
+      rgba(166, 115, 82, 0.08),
+      rgba(140, 90, 60, 0.25),
+      rgba(166, 115, 82, 0.08),
+      rgba(140, 90, 60, 0.25));
   filter: blur(18px);
   animation: hero-glow-pulse 4s ease-in-out infinite alternate;
   z-index: -1;
@@ -211,7 +212,7 @@
   left: -10%;
   width: 60%;
   height: 60%;
-  background: radial-gradient(ellipse at center, hsla(38, 38%, 60%, 0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(140, 90, 60, 0.08) 0%, transparent 70%);
   filter: blur(80px);
   pointer-events: none;
   z-index: 0;

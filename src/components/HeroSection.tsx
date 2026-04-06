@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { gsap } from "gsap";
+import { AuroraBackground } from "@/components/ui/aurora-background";
 
 const HeroSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -85,9 +86,9 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-cream">
-      <div className="hero-ambient-glow" />
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full">
+    <section ref={sectionRef} className="relative min-h-screen overflow-hidden">
+      <AuroraBackground className="min-h-screen w-full flex items-center pt-20 bg-cream" showRadialGradient={true}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div className="relative order-1 hero-3d-perspective">
             <div ref={videoContainerRef} className="hero-3d-video-container">
@@ -100,21 +101,21 @@ const HeroSection = () => {
 
           <div className="order-2 flex flex-col gap-8">
             <h1 ref={headlineRef} className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.05] tracking-tight">
-              <span className="text-foreground">{typedLine1 || "\u00A0"}</span>
+              <span className="!text-foreground">{typedLine1 || "\u00A0"}</span>
               <br />
-              <span className="text-accent">
+              <span className="text-[#8C5A3C]">
                 {typedLine2 || (typedLine1 === "Transform Spaces." ? "" : "\u00A0")}
                 <span className={`font-light transition-opacity duration-100 ${showCursor ? "opacity-100" : "opacity-0"}`}>|</span>
               </span>
             </h1>
-            <p ref={subtextRef} className="text-lg lg:text-xl font-medium text-muted-foreground max-w-lg leading-relaxed">
+            <p ref={subtextRef} className="text-lg lg:text-xl font-bold text-muted-foreground max-w-lg leading-relaxed">
               Experience next-generation modular interiors engineered with precision and elegance.
             </p>
             <div ref={ctaRef} className="flex flex-wrap gap-4">
-              <Button size="lg" className="btn-slide bg-foreground text-background hover:text-foreground rounded-full px-8 text-base font-semibold border-2 border-foreground transition-all duration-500 hover:-translate-y-0.5">
+              <Button size="lg" className="bg-[#8C5A3C] text-white hover:bg-[#7A4E34] rounded-full px-8 text-base font-semibold">
                 Explore Designs
               </Button>
-              <Button size="lg" variant="outline" className="rounded-full px-8 text-base font-semibold border-2 border-foreground/20 hover:border-accent hover:text-accent transition-all duration-500 hover:-translate-y-0.5">
+              <Button size="lg" variant="outline" className="rounded-full px-8 text-base font-semibold border-2 border-foreground/20 hover:border-foreground/40">
                 Get Quote
               </Button>
             </div>
@@ -125,7 +126,7 @@ const HeroSection = () => {
       {/* WhatsApp Button */}
       <div className="fixed bottom-8 right-8 z-[100] flex items-center justify-center">
         <div className="absolute right-[100%] flex items-center mr-4 cursor-default animate-in fade-in duration-500 pointer-events-none">
-          <div className="bg-white text-foreground text-[15px] font-medium px-5 py-2.5 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] whitespace-nowrap">Contact Us</div>
+          <div className="bg-white text-gray-800 text-[15px] font-medium px-5 py-2.5 rounded-[12px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] whitespace-nowrap">Contact Us</div>
           <div className="w-0 h-0 border-y-[6px] border-y-transparent border-l-[8px] border-l-white -ml-[1px]" />
         </div>
         <div className="absolute inset-[-24px] bg-[#25D366]/10 rounded-full animate-pulse pointer-events-none" />
@@ -136,6 +137,7 @@ const HeroSection = () => {
           </svg>
         </a>
       </div>
+      </AuroraBackground>
     </section>
   );
 };

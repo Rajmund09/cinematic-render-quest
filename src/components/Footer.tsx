@@ -1,8 +1,8 @@
 const Footer = () => (
-  <footer className="py-12 px-6 md:px-12 bg-charcoal border-t border-white/10">
+  <footer className="py-12 px-6 md:px-12 bg-charcoal border-t border-foreground/10">
     <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
       <span className="text-lg font-extrabold tracking-[0.15em] text-gradient-gold">CABINET FACTORY</span>
-      <p className="text-xs tracking-wider text-white/40">
+      <p className="text-xs tracking-wider text-muted-foreground">
         © {new Date().getFullYear()} Cabinet Factory. All rights reserved.
       </p>
       <div className="flex gap-8">
@@ -10,7 +10,7 @@ const Footer = () => (
           <a
             key={s}
             href="#"
-            className="text-xs tracking-wider text-white/40 hover:text-accent transition-colors duration-300"
+            className="text-xs tracking-wider text-muted-foreground hover:text-accent transition-colors duration-300"
           >
             {s}
           </a>

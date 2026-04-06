@@ -9,6 +9,7 @@ const materials = [
     name: "Solid Oak",
     desc: "Warm, durable hardwood with natural grain patterns that age beautifully over decades.",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&q=80",
+    color: "from-amber-800/90 to-amber-950/90",
     texture: "Natural Grain",
     origin: "European Forests",
   },
@@ -16,6 +17,7 @@ const materials = [
     name: "Italian Marble",
     desc: "Luxurious Carrara marble surfaces for countertops and accent features with unique veining.",
     image: "https://images.unsplash.com/photo-1617791160505-6f00504e3519?w=600&q=80",
+    color: "from-stone-600/90 to-stone-800/90",
     texture: "Veined Polish",
     origin: "Carrara, Italy",
   },
@@ -23,6 +25,7 @@ const materials = [
     name: "Matte Lacquer",
     desc: "Silky-smooth anti-fingerprint finish in a curated palette of neutrals and bold accents.",
     image: "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=600&q=80",
+    color: "from-zinc-700/90 to-zinc-900/90",
     texture: "Satin Smooth",
     origin: "German Engineering",
   },
@@ -30,6 +33,7 @@ const materials = [
     name: "Brushed Brass",
     desc: "Warm metallic accents hand-finished to create subtle highlights and tactile luxury.",
     image: "https://images.unsplash.com/photo-1574643156929-51fa098b0394?w=600&q=80",
+    color: "from-yellow-700/90 to-yellow-900/90",
     texture: "Brushed Metal",
     origin: "Artisan Workshop",
   },
@@ -41,6 +45,7 @@ const MaterialsSection = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Header
       gsap.from(".mat-header > *", {
         y: 50,
         opacity: 0,
@@ -50,6 +55,7 @@ const MaterialsSection = () => {
         scrollTrigger: { trigger: sectionRef.current, start: "top 80%" },
       });
 
+      // Cards from bottom with rotation
       gsap.from(".material-card", {
         y: 100,
         opacity: 0,
@@ -57,9 +63,10 @@ const MaterialsSection = () => {
         duration: 1,
         stagger: 0.15,
         ease: "power3.out",
-        scrollTrigger: { trigger: ".mat-grid", start: "top 88%" },
+        scrollTrigger: { trigger: ".mat-grid", start: "top 85%" },
       });
 
+      // Parallax background
       gsap.to(".mat-bg-element", {
         y: -50,
         scrollTrigger: { trigger: sectionRef.current, start: "top bottom", end: "bottom top", scrub: 1 },
@@ -94,9 +101,11 @@ const MaterialsSection = () => {
 
   return (
     <section ref={sectionRef} id="materials" className="relative py-32 lg:py-44 bg-background overflow-hidden">
-      <div className="mat-bg-element absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
+      {/* Background decorative */}
+      <div className="mat-bg-element absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-accent/3 blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        {/* Header */}
         <div className="mat-header text-center mb-20">
           <p className="text-sm font-semibold tracking-[0.25em] uppercase text-accent mb-5">
             Materials & Finishes
@@ -109,30 +118,35 @@ const MaterialsSection = () => {
           </p>
         </div>
 
+        {/* Materials grid */}
         <div className="mat-grid grid md:grid-cols-2 lg:grid-cols-4 gap-5">
           {materials.map((m, i) => (
             <div
               key={i}
-              className="material-card group relative h-[400px] lg:h-[480px] rounded-3xl overflow-hidden cursor-pointer shadow-lg"
+              className="material-card group relative h-[400px] lg:h-[480px] rounded-3xl overflow-hidden cursor-pointer"
               onMouseEnter={(e) => handleHover(i, e)}
               onMouseLeave={handleLeave}
             >
+              {/* Image */}
               <img
                 src={m.image}
                 alt={m.name}
-                loading="lazy"
                 className="mat-img absolute inset-0 w-full h-full object-cover"
               />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+              {/* Base gradient always visible */}
+              <div className={`absolute inset-0 bg-gradient-to-t ${m.color}`} />
 
+              {/* Hover overlay */}
               <div className="mat-overlay absolute inset-0 bg-black/30 backdrop-blur-[2px] opacity-0" />
 
+              {/* Default label */}
               <div className={`absolute bottom-0 left-0 right-0 p-6 z-10 transition-opacity duration-300 ${hoveredIndex === i ? "opacity-0" : "opacity-100"}`}>
                 <span className="text-xs font-bold tracking-[0.2em] uppercase text-accent">{m.texture}</span>
                 <h3 className="text-2xl font-extrabold text-white mt-1">{m.name}</h3>
               </div>
 
+              {/* Revealed details */}
               <div className="mat-details absolute inset-0 flex flex-col items-center justify-center text-center px-6 translate-y-[20px] opacity-0 z-20">
                 <span className="text-xs font-bold tracking-[0.25em] uppercase text-accent mb-3">{m.origin}</span>
                 <h3 className="text-2xl font-extrabold text-white mb-2">{m.name}</h3>
@@ -143,6 +157,7 @@ const MaterialsSection = () => {
                 </div>
               </div>
 
+              {/* Corner number */}
               <div className="absolute top-5 right-5 z-10 text-white/15 text-5xl font-black select-none">
                 0{i + 1}
               </div>
