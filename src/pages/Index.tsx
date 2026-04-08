@@ -24,48 +24,130 @@ const Index = () => {
   useEffect(() => {
     if (!mainRef.current) return;
 
+    // Responsive-aware matchMedia for mobile vs desktop scroll triggers
+    const mm = gsap.matchMedia();
+
     const ctx = gsap.context(() => {
-      // Scroll-triggered background color transitions
-      const bgSections = mainRef.current!.querySelectorAll<HTMLElement>("[data-bg]");
+      mm.add(
+        {
+          isMobile: "(max-width: 767px)",
+          isTablet: "(min-width: 768px) and (max-width: 1023px)",
+          isDesktop: "(min-width: 1024px)",
+        },
+        (context) => {
+          const { isMobile, isTablet } = context.conditions!;
 
-      bgSections.forEach((section) => {
-        const bgColor = section.getAttribute("data-bg") || "#F9F8F6";
+          // Adjust trigger points based on device
+          const enterStart = isMobile ? "top 80%" : isTablet ? "top 70%" : "top 60%";
+          const enterEnd = isMobile ? "bottom 20%" : isTablet ? "bottom 30%" : "bottom 40%";
+          const bgDuration = isMobile ? 0.5 : 0.8;
 
-        ScrollTrigger.create({
-          trigger: section,
-          start: "top 60%",
-          end: "bottom 40%",
-          onEnter: () => {
+          // Scroll-triggered background + text color transitions
+          const bgSections = mainRef.current!.querySelectorAll<HTMLElement>("[data-bg]");
+
+          bgSections.forEach((section) => {
+            const bgColor = section.getAttribute("data-bg") || "#F9F8F6";
+            const isDark = ["#1a1a1a", "#0a0a0a", "#111111", "#000000"].includes(bgColor);
+            const textColor = isDark ? "#f5f5f5" : "#1a1a1a";
+
+            // Smooth scrub-based color interpolation
             gsap.to("body", {
               backgroundColor: bgColor,
-              duration: 0.8,
-              ease: "power2.inOut",
-              overwrite: "auto",
+              color: textColor,
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: enterStart,
+                end: "top 20%",
+                scrub: isMobile ? 0.8 : 1.2,
+              },
             });
-          },
-          onEnterBack: () => {
-            gsap.to("body", {
-              backgroundColor: bgColor,
-              duration: 0.8,
-              ease: "power2.inOut",
-              overwrite: "auto",
-            });
-          },
-        });
-      });
 
-      // Smooth section transitions — subtle fade dividers
-      mainRef.current!.querySelectorAll(".section-divider").forEach((el) => {
-        gsap.from(el, {
-          scaleX: 0,
-          duration: 1.2,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 90%" },
-        });
-      });
+            // Callback-based for precise snapping on enter/leave
+            ScrollTrigger.create({
+              trigger: section,
+              start: enterStart,
+              end: enterEnd,
+              onEnter: () => {
+                gsap.to("body", {
+                  backgroundColor: bgColor,
+                  color: textColor,
+                  duration: bgDuration,
+                  ease: "power2.inOut",
+                  overwrite: "auto",
+                });
+                // Update navbar awareness
+                document.documentElement.setAttribute("data-theme-zone", isDark ? "dark" : "light");
+              },
+              onEnterBack: () => {
+                gsap.to("body", {
+                  backgroundColor: bgColor,
+                  color: textColor,
+                  duration: bgDuration,
+                  ease: "power2.inOut",
+                  overwrite: "auto",
+                });
+                document.documentElement.setAttribute("data-theme-zone", isDark ? "dark" : "light");
+              },
+            });
+          });
+
+          // Section reveal animations
+          mainRef.current!.querySelectorAll<HTMLElement>("[data-bg]").forEach((section) => {
+            const children = section.querySelectorAll("h1, h2, h3, p, .animate-on-scroll");
+            if (children.length) {
+              gsap.from(children, {
+                y: isMobile ? 30 : 50,
+                opacity: 0,
+                duration: isMobile ? 0.6 : 0.9,
+                stagger: 0.08,
+                ease: "power3.out",
+                scrollTrigger: {
+                  trigger: section,
+                  start: isMobile ? "top 90%" : "top 80%",
+                },
+              });
+            }
+          });
+
+          // Dividers
+          mainRef.current!.querySelectorAll(".section-divider").forEach((el) => {
+            gsap.from(el, {
+              scaleX: 0,
+              duration: isMobile ? 0.8 : 1.2,
+              ease: "power3.out",
+              scrollTrigger: { trigger: el, start: "top 92%" },
+            });
+          });
+
+          // Parallax overlays on dark sections
+          if (!isMobile) {
+            mainRef.current!.querySelectorAll<HTMLElement>(".parallax-overlay").forEach((el) => {
+              gsap.to(el, {
+                yPercent: -20,
+                ease: "none",
+                scrollTrigger: {
+                  trigger: el.parentElement,
+                  start: "top bottom",
+                  end: "bottom top",
+                  scrub: 1.5,
+                },
+              });
+            });
+          }
+        }
+      );
     }, mainRef);
 
-    return () => ctx.revert();
+    // Refresh on resize for responsive recalculation
+    const onResize = () => ScrollTrigger.refresh();
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      mm.revert();
+      ctx.revert();
+    };
   }, []);
 
   return (
