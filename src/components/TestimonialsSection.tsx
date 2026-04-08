@@ -47,7 +47,7 @@ export default function TestimonialsSection() {
             What Our Clients Say
           </h2>
         </div>
-        <AnimatedTestimonials testimonials={testimonials} />
+        <AnimatedTestimonials testimonials={testimonials} autoplay={true} />
       </div>
     </section>
   );
